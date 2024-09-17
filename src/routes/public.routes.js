@@ -18,9 +18,14 @@ router.post("/auth/register", (req, res)=>{
 	res.send("Not Implemented");
 });
 
-router.post("auth/contact", (req, res)=>{
+router.post("/auth/contact", (req, res)=>{
 	console.log("body: ",req.body)
 	res.send("OK")
+});
+
+// test endpoint
+router.get("/auth/ping", (req, res)=>{
+	res.send("pong");
 });
 
 export default router;

@@ -2,8 +2,9 @@ import 'dotenv/config'
 import express from "express";
 import publicRoutes from "./src/routes/public.routes.js";
 import getUsers from './src/DB/db.js';
+import { client } from './src/bot/bot.js';
 
-const PORT = process.env.PORT ?? 3000;
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 // json middleware
@@ -21,7 +22,7 @@ app.use((req, res, next)=>{
 })
 
 // public endpoints
-app.use(publicRoutes);
+app.use("/auth",publicRoutes);
 
 // 
 app.get("/dasboard", async (req, res)=>{

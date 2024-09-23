@@ -58,11 +58,12 @@ CREATE TABLE claim_warranty(
 );
 --INSERT INTO claim_warranty(job) VALUES("fea6a04c-75e9-11ef-b53d-0242ac110002");
 
-
-
--- TODO
 -- create jwt table
--- CREATE TABLE jwt(
---     jwt 
---     userID
--- );
+CREATE TABLE jwt(
+    jwt VARCHAR(500) NOT NULL, 
+    userID INTEGER UNSIGNED,
+
+    FOREIGN KEY (userID) REFERENCES clients(id),
+    PRIMARY KEY (jwt, userID)  
+);
+-- INSERT INTO jwt(jwt, userID) VALUES("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6IlBhYmxvIiwibGFzdE5hbWUiOiJWZXJnYXJhIiwicGhvbmUiOiIwNDI0MTEyMjM0NSIsInVzZXJfaWQiOiI2NzYyNjJiOC03NWU3LTExZWYtYjUzZC0wMjQyYWMxMTAwMDIiLCJyb2xlIjoiYWRtaW4iLCJxdWFsaXR5IjoyLjUsImlhdCI6MTcyNzEyNzA0MCwiZXhwIjoxNzI3Mzg2MjQwfQ.vCxFYog6wK7HEibzaKwIuMhUE2z4HoM_2319pSbpApg", 3)

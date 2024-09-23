@@ -3,6 +3,7 @@ import 'dotenv/config'
 // Get the client
 import mysql from 'mysql2/promise';
 import { createHmac } from 'crypto';
+import { createToken, verifyToken } from '../auth/auth.js';
 
 function createPassword(password){
     return createHmac('sha1', process.env.SECRET)
@@ -21,7 +22,7 @@ const connection = await mysql.createConnection({
 
 export async function getUsers() {
     try {
-        const [results] = await connection.query('SELECT * FROM users');
+        const [results] = await connection.query('SELECT * FROM clients where role="user"');
         // console.log(results); // results contains rows returned by server
         return results;
     } catch (err) {
@@ -53,10 +54,10 @@ export async function login(credentials) {
     
     if( results[0].password == hash) {
         // TODO
-        // create jwt
+        const token = createToken(cleanedResult);
 		// save jwt
-		// send jwt
-        return cleanedResult;
+		saveJWT(token,cleanedResult.id);
+        return token;
     }
 
     else return null;
@@ -108,4 +109,14 @@ export async function register(credentials){
         }
     }
     
+}
+
+export async function removeToken(token){
+    const [results] = await connection.query(`DELETE FROM jwt WHERE jwt=?`,[token]);
+    // console.log(results);
+}
+
+async function saveJWT(token, id){
+    const [results] = await connection.query(`INSERT INTO jwt(jwt, userID) VALUES(?,?)`,[token, id]);
+    // console.log(results);
 }

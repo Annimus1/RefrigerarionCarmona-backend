@@ -1,6 +1,5 @@
 // import { sendMsg } from '../bot/bot.js';
 import express from 'express';
-
 import { createLead, getUsers, login, register } from '../DB/db.js';
 import { sendMsg } from '../bot/bot.js';
 
@@ -14,7 +13,8 @@ router.post("/login", async (req, res) => {
 	const result = await login({ user, password });
 
 	if (result) {
-		res.send("ok")
+		res.setHeader('Authorization', `Bearer ${result}`);
+		res.send(JSON.stringify({token: result}));
 	}
 	else {
 		res.status(401).send();

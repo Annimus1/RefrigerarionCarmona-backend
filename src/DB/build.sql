@@ -30,15 +30,15 @@ CREATE TABLE clients(
 
 -- create jobs table 
 CREATE TABLE jobs(
-    id varchar(36) default(uuid()) primary key,
+    id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     owner INTEGER UNSIGNED NOT NULL,
     client INTEGER UNSIGNED NOT NULL,
-    category ENUM("mantenimiento", "instalación", "reparación"),
+    category ENUM("mantenimiento", "instalacion", "reparacion"),
     creation_date DATE NOT NULL DEFAULT (CURRENT_DATE()),
     update_date DATE NOT NULL DEFAULT (CURRENT_DATE()),
     warranty_expiration_date DATE NOT NULL,
     warranty_coverage VARCHAR(255) NOT NULL,
-    price DECIMAL(6,2) NOT NULL,
+    price DECIMAL(6,2),
     note VARCHAR(255),
     status ENUM("pendiente", "realizado") DEFAULT 'pendiente',
     payment_status ENUM("pendiente", "pagado") DEFAULT 'pendiente',
@@ -51,7 +51,7 @@ CREATE TABLE jobs(
 -- create claim warranty table
 CREATE TABLE claim_warranty(
     id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    job VARCHAR(36) NOT NULL,
+    job INTEGER UNSIGNED NOT NULL,
     date DATE NOT NULL DEFAULT (CURRENT_DATE()),
 
     FOREIGN KEY (job) REFERENCES jobs(id)

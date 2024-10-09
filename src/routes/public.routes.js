@@ -1,10 +1,9 @@
-// import { sendMsg } from '../bot/bot.js';
 import express from 'express';
 import { createLead, getUsers, login, register } from '../DB/db.js';
-import { sendMsg } from '../bot/bot.js';
+// uncoment this to active whatsapp 
+// import { sendMsg } from '../bot/bot.js';
 
 
-const app = express();
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
@@ -13,8 +12,10 @@ router.post("/login", async (req, res) => {
 	const result = await login({ user, password });
 
 	if (result) {
-		res.setHeader('Authorization', `Bearer ${result}`);
-		res.send(JSON.stringify({token: result}));
+		res.cookie('access_token', 'Bearer ' + result, {
+		expires: new Date(Date.now() + 3 * 24 * 3600000) // cookie will be removed after 3 days
+		})
+		res.status(200).send();
 	}
 	else {
 		res.status(401).send();
@@ -39,11 +40,15 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/contact", (req, res) => {
+	/*
+		return a code 200 if everything was ok, 
+		else code 400 if name, lastName or phone are missed
+	*/
 
 	const { name, lastName, phone, category, aditionalData } = req.body;
-	
-	if (name.length <= 0 || lastName.length <= 0 || phone.length <= 0 ) res.status(400).send();
-	
+
+	if (name.length <= 0 || lastName.length <= 0 || phone.length <= 0) res.status(400).send();
+
 	else {
 		let note = `Hola, Mi nombre es ${name} ${lastName} ${phone}. Escribo ya que necesito un@ ${category}. ${aditionalData ? `${aditionalData}.` : ``}`;
 
@@ -51,7 +56,9 @@ router.post("/contact", (req, res) => {
 		const result = createLead(note);
 
 		// Send the msj to the group
-		sendMsg(`_PabloBot_
+		// uncoment this to active whatsapp 
+		// sendMsg
+		console.log(`_PabloBot_
 *_Cliente potencial_* 
 ${note}
 
@@ -66,9 +73,12 @@ ext: ${process.env.BACKEND_DOMAIN}auth/ping?name=${name}&lastName=${lastName}&ph
 
 // test endpoint
 router.get("/ping", async (req, res) => {
+	// // getting query params from url
+	// // localhost:3000/auth/ping?name=Pablo&lastName=Vergara&phone=04245250232
 	console.log(req.query);
-	res.redirect(`${process.env.BACKEND_DOMAIN}`)
-	// res.send("<h1>ok</h1>")
+	// // redirect to private endpoint
+	// res.redirect(`${process.env.BACKEND_DOMAIN}`)
+	res.send("<h1>ok</h1>")
 });
 
 

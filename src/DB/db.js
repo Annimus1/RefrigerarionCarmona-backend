@@ -38,26 +38,48 @@ export async function createLead(message) {
 }
 
 // USERS
-export async function getUsers() {
+export async function getUsers(data, expectedRole) {
   try {
-    const [results] = await connection.query('SELECT * FROM clients where role="user"');
+    const [results] = await connection.query(`SELECT * FROM clients ${ expectedRole ? 'WHERE role='+"'"+expectedRole+"'" : '' };`);
     // console.log(results); // results contains rows returned by server
-    return results;
+    if (data.role == "admin"){
+      return results
+    }else{
+      return null;
+    }
   } catch (err) {
-    console.log(err);
+    console.log(`Unknow role ${expectedRole}: `,err);
+    return null;
+  }
+}
+
+export async function getUserById(data, id) {
+  try {
+    const [results] = await connection.query(`SELECT * FROM clients WHERE id=?`, [id]);
+
+    if (data.role == "admin"){
+      return results[0];
+    }else{
+      return null;
+    }
+
+  } catch (err) {
+    console.log(`Id not found: `,err);
+    return null;
   }
 }
 
 export async function login(credentials) {
   // execute the query
   const [results] = await connection.query(`SELECT * FROM clients WHERE phone=?`, [credentials.user]);
-
+  
   // get the user info as an object omiting password
-  const cleanedResult = results.length > 0 ? Object.fromEntries(Object.entries(results[0]).filter(e => e[0] != 'password')) : null;
-
+  const cleanedResult = results.length > 0 ? Object.fromEntries(Object.entries(results[0]).filter(e => e[0] != 'password')) : null;  
+  
   if (!cleanedResult) return null;
-
+  
   const hash = createPassword(credentials.password)
+  console.log(hash,results[0].password)
 
   if (results[0].password == hash) {
     // TODO

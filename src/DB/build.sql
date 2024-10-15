@@ -10,7 +10,7 @@ CREATE TABLE leads(
     message VARCHAR(255) NOT NULL,
     date DATE NOT NULL DEFAULT (CURRENT_DATE())
 );
---INSERT INTO leads(message) values("prueba");
+INSERT INTO leads(message) values("initializing database");
 
 
 -- create clients table
@@ -25,10 +25,10 @@ CREATE TABLE clients(
     phone VARCHAR(15) NOT NULL UNIQUE,
     password VARCHAR(40)
 );
--- INSERT INTO clients(name, lastName, phone, role, password) VALUES("Pablo","Vergara","04241122345","admin",SHA1('1234'));
--- INSERT INTO clients(name, lastName, phone) VALUES("Jhon","Doe","+584123345098"),("Jane", "Doe", "04241111444");
+INSERT INTO clients(name, lastName, phone, role) VALUES("Pablo","Vergara","04241122345","admin");
+INSERT INTO clients(name, lastName, phone) VALUES("Jhon","Doe","+584123345098"),("Jane", "Doe", "04241111444");
 
--- create jobs table 
+-- create jobs table
 CREATE TABLE jobs(
     id INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     owner INTEGER UNSIGNED NOT NULL,
@@ -46,7 +46,9 @@ CREATE TABLE jobs(
     FOREIGN KEY (owner) REFERENCES clients(id),
     FOREIGN KEY (client) REFERENCES clients(id)
 );
--- INSERT INTO jobs(owner, client, category, warranty_expiration_date, price, note, warranty_coverage) VALUES(3,1,"mantenimiento", "2024-10-18",20,"aire de ventana 12.000BTU","ruidos extra#os y descompresion"),(3,2,"instalación", "2025-09-18", 1500, "Cava cuarto con motor de 3HP trifasico", "full garantia y servicio tecnico. exceptuando motor quemado devido a falla de voltage.");
+INSERT INTO jobs(owner, client, category, warranty_expiration_date, price, note, warranty_coverage) 
+VALUES(3,1,"mantenimiento", "2024-10-18",20,"aire de ventana 12.000BTU","ruidos extra#os y descompresion"),
+      (3,2,"instalacion", "2025-09-18", 1500, "Cava cuarto con motor de 3HP trifasico", "full garantia y servicio tecnico. exceptuando motor quemado devido a falla de voltage.");
 
 -- create claim warranty table
 CREATE TABLE claim_warranty(
@@ -56,14 +58,14 @@ CREATE TABLE claim_warranty(
 
     FOREIGN KEY (job) REFERENCES jobs(id)
 );
---INSERT INTO claim_warranty(job) VALUES("fea6a04c-75e9-11ef-b53d-0242ac110002");
+INSERT INTO claim_warranty(job) VALUES(1);
 
 -- create jwt table
 CREATE TABLE jwt(
-    jwt VARCHAR(500) NOT NULL, 
+    jwt VARCHAR(500) NOT NULL,
     userID INTEGER UNSIGNED,
 
     FOREIGN KEY (userID) REFERENCES clients(id),
-    PRIMARY KEY (jwt, userID)  
+    PRIMARY KEY (jwt, userID)
 );
--- INSERT INTO jwt(jwt, userID) VALUES("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6IlBhYmxvIiwibGFzdE5hbWUiOiJWZXJnYXJhIiwicGhvbmUiOiIwNDI0MTEyMjM0NSIsInVzZXJfaWQiOiI2NzYyNjJiOC03NWU3LTExZWYtYjUzZC0wMjQyYWMxMTAwMDIiLCJyb2xlIjoiYWRtaW4iLCJxdWFsaXR5IjoyLjUsImlhdCI6MTcyNzEyNzA0MCwiZXhwIjoxNzI3Mzg2MjQwfQ.vCxFYog6wK7HEibzaKwIuMhUE2z4HoM_2319pSbpApg", 3)
+-- INSERT INTO jwt(jwt, userID) VALUES("", 3)

@@ -10,15 +10,16 @@ router.post("/login", async (req, res) => {
 
 	const { user, password } = req.body;
 	const result = await login({ user, password });
+	// console.log(result)
 
-	if (result) {
+	if(result) {
 		res.cookie('access_token', 'Bearer ' + result, {
 		expires: new Date(Date.now() + 3 * 24 * 3600000) // cookie will be removed after 3 days
 		})
 		res.status(200).send();
 	}
 	else {
-		res.status(401).send();
+		res.status(401).send('User not found.');
 	}
 });
 
@@ -34,7 +35,7 @@ router.post("/register", async (req, res) => {
 
 	let result = await register({ name, lastName, phone, password });
 
-	if (result == 0) res.send("User created.");
+	if (result == 0) res.status(201).send("User created.");
 	else res.status(403).send("User Already exists.");
 
 });

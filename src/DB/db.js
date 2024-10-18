@@ -40,31 +40,39 @@ export async function createLead(message) {
 // USERS
 export async function getUsers(data, expectedRole) {
   try {
-    const [results] = await connection.query(`SELECT * FROM clients ${ expectedRole ? 'WHERE role='+"'"+expectedRole+"'" : '' };`);
+    const [results] = await connection.query(`SELECT * FROM clients ${expectedRole ? 'WHERE role=' + "'" + expectedRole + "'" : ''};`);
     // console.log(results); // results contains rows returned by server
-    if (data.role == "admin"){
+    if (data.role == "admin") {
       return results
-    }else{
+    } else {
       return null;
     }
   } catch (err) {
-    console.log(`Unknow role ${expectedRole}: `,err);
+    console.log(`Unknow role ${expectedRole}: `, err);
     return null;
   }
 }
 
 export async function getUserById(data, id) {
   try {
+    // getting results from database
     const [results] = await connection.query(`SELECT * FROM clients WHERE id=?`, [id]);
 
-    if (data.role == "admin"){
-      return results[0];
-    }else{
-      return null;
+    // clean result to omit password
+    const cleanedResult = results.length > 0 ? Object.fromEntries(Object.entries(results[0]).filter(e => e[0] != 'password')) : null;
+
+    if (data.role == "admin") {
+      return cleanedResult;
+    } else {
+      if (data.id == id) {
+        return cleanedResult;
+      } else {
+        return null;
+      }
     }
 
   } catch (err) {
-    console.log(`Id not found: `,err);
+    console.log(`Id not found: `, err);
     return null;
   }
 }
@@ -72,14 +80,14 @@ export async function getUserById(data, id) {
 export async function login(credentials) {
   // execute the query
   const [results] = await connection.query(`SELECT * FROM clients WHERE phone=?`, [credentials.user]);
-  
+
   // get the user info as an object omiting password
-  const cleanedResult = results.length > 0 ? Object.fromEntries(Object.entries(results[0]).filter(e => e[0] != 'password')) : null;  
-  
+  const cleanedResult = results.length > 0 ? Object.fromEntries(Object.entries(results[0]).filter(e => e[0] != 'password')) : null;
+
   if (!cleanedResult) return null;
-  
+
   const hash = createPassword(credentials.password)
-  console.log(hash,results[0].password)
+  // console.log(hash,results[0].password)
 
   if (results[0].password == hash) {
     // TODO
@@ -90,6 +98,19 @@ export async function login(credentials) {
   }
 
   else return null;
+
+}
+
+export async function createAdmin(data) {
+  try {
+    const result = await connection.query(`INSERT INTO clients(name, lastName, phone, role) VALUES(?,?,?,?)`, [data.name, data.lastName, data.phone, "admin"]);
+
+    return getIdLastRecord("clients");
+
+  } catch (error) {
+    console.log("Error trying to insert new Client: ", error)
+    return -1
+  }
 
 }
 
@@ -198,7 +219,9 @@ export async function getJobById(payload, id) {
     // if user, only can view their jobs 
     else {
       const [rows] = await connection.query(`SELECT * FROM jobs WHERE id=?`, [id]);
-      return (rows[0].client == data.id) ? rows : null;
+      // console.log(rows[0].client, payload.id)
+
+      return (rows[0].client == payload.id) ? rows[0] : null;
     }
   } catch (error) {
     console.error("Error getting jobs information: ", error);
@@ -208,13 +231,13 @@ export async function getJobById(payload, id) {
 
 export async function updateJob(job) {
   try {
-    
-    const [rows] = await connection.query(`UPDATE jobs SET owner=?, client=?, category=?, update_date=?, warranty_expiration_date=?, warranty_coverage=?, price=?, note=?,  status=?, payment_status=?WHERE id=?`,[job.owner, job.client, job.category, job.update_date, job.warranty_expiration_date, job.warranty_coverage, job.price, job.note, job.status, job.payment_status, job.id]);
-    
+
+    const [rows] = await connection.query(`UPDATE jobs SET owner=?, client=?, category=?, update_date=?, warranty_expiration_date=?, warranty_coverage=?, price=?, note=?,  status=?, payment_status=?WHERE id=?`, [job.owner, job.client, job.category, job.update_date, job.warranty_expiration_date, job.warranty_coverage, job.price, job.note, job.status, job.payment_status, job.id]);
+
     console.log(rows[0]);
-    
+
     return rows[0];
-  
+
   } catch (error) {
   }
 }

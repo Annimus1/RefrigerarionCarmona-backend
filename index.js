@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import express from "express";
+import cors from 'cors';
 // routes
 import publicRoutes from "./src/routes/public.routes.js";
 import views from './src/routes/views.routes.js';
@@ -13,6 +14,9 @@ import authMiddleware from './src/auth/authMiddleware.js';
 
 const PORT = process.env.PORT || 3000;
 const app = express();
+
+// enable cors usage 
+app.use(cors());
 
 // remove x-powered-by
 app.disable('x-powered-by');

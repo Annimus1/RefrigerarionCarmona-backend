@@ -72,6 +72,22 @@ router.get("/job", async (req, res) => {
 	}
 });
 
+// get job by id
+router.get("/job/:id", async (req, res) => {
+	// get token and extract payload
+	const token = req.get("Authorization").split(" ")[1];
+	const payload = getPayload(token);
+
+	const job = await getJobById(payload, req.params.id)
+
+	if(job){
+		res.send(JSON.stringify(job));
+	}
+	else{
+		res.status(401).send();
+	}
+});
+
 // edit a job
 router.put("/job/:id", async (req, res) => {
 	// get the token and extract payload
@@ -114,7 +130,7 @@ router.put("/job/:id", async (req, res) => {
 			res.status(500).send();
 		}
 
-	} 
+	}
 	// User can't modify jobs 
 	else { // user
 		res.status(401).send();

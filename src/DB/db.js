@@ -94,7 +94,7 @@ export async function login(credentials) {
     const token = createToken(cleanedResult);
     // save jwt
     saveJWT(token, cleanedResult.id);
-    return token;
+    return {"token":token, role:cleanedResult.role};
   }
 
   else return null;

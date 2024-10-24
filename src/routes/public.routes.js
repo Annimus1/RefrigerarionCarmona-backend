@@ -9,14 +9,11 @@ const router = express.Router();
 router.post("/login", async (req, res) => {
 
 	const { user, password } = req.body;
+	// console.log("body:", user, password)
 	const result = await login({ user, password });
-	// console.log(result)
 
-	if(result) {
-		res.cookie('access_token', 'Bearer ' + result, {
-		expires: new Date(Date.now() + 3 * 24 * 3600000) // cookie will be removed after 3 days
-		})
-		res.status(200).send();
+	if (result) {
+		res.status(200).send(JSON.stringify({ token: result.token, role: result.role,expires: new Date(Date.now() + 3 * 24 * 3600000) }));
 	}
 	else {
 		res.status(401).send('User not found.');
@@ -41,10 +38,6 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/contact", (req, res) => {
-	/*
-		return a code 200 if everything was ok, 
-		else code 400 if name, lastName or phone are missed
-	*/
 
 	const { name, lastName, phone, category, aditionalData } = req.body;
 
@@ -54,7 +47,7 @@ router.post("/contact", (req, res) => {
 		let note = `Hola, Mi nombre es ${name} ${lastName} ${phone}. Escribo ya que necesito un@ ${category}. ${aditionalData ? `${aditionalData}.` : ``}`;
 
 		// save the lead in the database
-		const result = createLead(note);
+		// const result = createLead(note);
 
 		// Send the msj to the group
 		// uncoment this to active whatsapp 
@@ -63,7 +56,7 @@ router.post("/contact", (req, res) => {
 *_Cliente potencial_* 
 ${note}
 
-ext: ${process.env.BACKEND_DOMAIN}auth/ping?name=${name}&lastName=${lastName}&phone=${phone}
+ext: ${process.env.FRONTEND_DOMAIN}?name=${name}&lastName=${lastName}&phone=${phone}
 			`);
 
 		// send the response to the front-end
@@ -73,10 +66,10 @@ ext: ${process.env.BACKEND_DOMAIN}auth/ping?name=${name}&lastName=${lastName}&ph
 });
 
 // test endpoint
-router.get("/ping", async (req, res) => {
+router.post("/ping", async (req, res) => {
 	// // getting query params from url
 	// // localhost:3000/auth/ping?name=Pablo&lastName=Vergara&phone=04245250232
-	console.log(req.query);
+	console.log(req.body);
 	// // redirect to private endpoint
 	// res.redirect(`${process.env.BACKEND_DOMAIN}`)
 	res.send("<h1>ok</h1>")
